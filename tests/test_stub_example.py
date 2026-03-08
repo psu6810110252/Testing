@@ -16,7 +16,7 @@ def fetch_data_and_check_prime():
 class StubTest(unittest.TestCase):
     
     # ใช้ @patch เพื่อทำ Stub ฟังก์ชัน get_numbers_from_api
-    @patch('test_stub_example.get_numbers_from_api')
+    @patch(__name__ + '.get_numbers_from_api')
     def test_fetch_data_with_stub(self, mock_get_numbers):
         # กำหนดค่าที่ต้องการให้ Stub จำลองและส่งกลับมา
         mock_get_numbers.return_value = [2, 3, 5, 7]
@@ -29,7 +29,7 @@ class StubTest(unittest.TestCase):
         # ตรวจสอบว่าฟังก์ชันจำลองถูกเรียกใช้งานจริงๆ
         mock_get_numbers.assert_called_once()
     
-    @patch('test_stub_example.get_numbers_from_api')
+    @patch(__name__ + '.get_numbers_from_api')
     def test_fetch_data_with_stub_composite(self, mock_get_numbers):
         mock_get_numbers.return_value = [2, 3, 4, 7]
         result = fetch_data_and_check_prime()
