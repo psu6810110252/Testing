@@ -1,36 +1,40 @@
 import unittest
-from unittest.mock import MagicMock
-from coe_number.number_utils import is_random_number_prime, NumberGeneratorService
+from unittest.mock import patch
+from coe_number.number_utils import is_prime_list
 
-class TestStubExample(unittest.TestCase):
-    def test_is_random_number_prime_with_stub_prime(self):
-        # 1. Create a stub for the NumberGeneratorService using Mock
-        stub_service = NumberGeneratorService()
+# สมมติว่ามีฟังก์ชัน get_numbers_from_api() ที่เรายังเขียนไม่เสร็จ หรือต่อเน็ตไม่ได้
+def get_numbers_from_api():
+    # โค้ดจริงอาจจะใช้ requests.get('...')
+    pass
+
+# สมมติว่านี่คือฟังก์ชันที่ต้องไปดึงข้อมูลจากระบบอื่น ซึ่งเราจะจำลองมัน
+def fetch_data_and_check_prime():
+    numbers = get_numbers_from_api() 
+    return is_prime_list(numbers)
+
+
+class StubTest(unittest.TestCase):
+    
+    # ใช้ @patch เพื่อทำ Stub ฟังก์ชัน get_numbers_from_api
+    @patch('test_stub_example.get_numbers_from_api')
+    def test_fetch_data_with_stub(self, mock_get_numbers):
+        # กำหนดค่าที่ต้องการให้ Stub จำลองและส่งกลับมา
+        mock_get_numbers.return_value = [2, 3, 5, 7]
         
-        # 2. Stub the fetch_random_number method to always return a prime number (e.g., 7)
-        # We don't want to actually wait for time.sleep or get random numbers in our tests!
-        stub_service.fetch_random_number = MagicMock(return_value=7)
+        # ทดสอบการทำงาน
+        result = fetch_data_and_check_prime()
         
-        # 3. Test the function using our stub
-        result = is_random_number_prime(stub_service)
-        
-        # 4. Assertions
+        # คาดหวังว่าต้องเป็น True เพราะข้อมูลจาก Stub เป็นจำนวนเฉพาะทั้งหมด
         self.assertTrue(result)
-        stub_service.fetch_random_number.assert_called_once()
-
-    def test_is_random_number_prime_with_stub_composite(self):
-        # 1. Create a stub for the NumberGeneratorService
-        stub_service = NumberGeneratorService()
-        
-        # 2. Stub the fetch_random_number method to always return a composite number (e.g., 10)
-        stub_service.fetch_random_number = MagicMock(return_value=10)
-        
-        # 3. Test the function using our stub
-        result = is_random_number_prime(stub_service)
-        
-        # 4. Assertions
+        # ตรวจสอบว่าฟังก์ชันจำลองถูกเรียกใช้งานจริงๆ
+        mock_get_numbers.assert_called_once()
+    
+    @patch('test_stub_example.get_numbers_from_api')
+    def test_fetch_data_with_stub_composite(self, mock_get_numbers):
+        mock_get_numbers.return_value = [2, 3, 4, 7]
+        result = fetch_data_and_check_prime()
         self.assertFalse(result)
-        stub_service.fetch_random_number.assert_called_once()
+        mock_get_numbers.assert_called_once()
 
 if __name__ == '__main__':
     unittest.main()
